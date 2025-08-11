@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Title: Use keywords people will search for -->
+    <title>Laravel Model Generator | Online CRUD & Relationship Scaffolding Tool</title>
+    
+    <!-- Meta Description: 150–160 chars with primary keywords -->
+    <meta name="description" content="Free Laravel Model Generator with smart relationship handling, CRUD generation, and strict Laravel conventions. Build migrations, models, and controllers online.">
+    
+    <!-- Keywords: Optional for SEO, but some search engines still use -->
+    <meta name="keywords" content="Laravel model generator, Laravel CRUD generator, Laravel migration generator, Laravel relationship generator, Laravel code scaffolding, Laravel model maker, Laravel controller generator">
+    
+    <!-- Open Graph for social sharing -->
+    <meta property="og:title" content="Laravel Model Generator | CRUD & Relationship Tool">
+    <meta property="og:description" content="Generate Laravel models, migrations, and controllers online with automatic relationship handling.">
+    <meta property="og:image" content="https://yourdomain.com/assets/images/preview.png">
+    <meta property="og:url" content="https://yourdomain.com/">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Laravel Model Generator | CRUD & Relationship Tool">
+    <meta name="twitter:description" content="Generate Laravel models, migrations, and controllers online with automatic relationship handling.">
+    <meta name="twitter:image" content="https://yourdomain.com/assets/images/preview.png">
+
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="assets/css/style.css" rel="stylesheet">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://yourdomain.com/">
+</head>
+
+<body>
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h1><i class="bi bi-gear"></i> Ababil Code Generator</h1>
+            <p class="lead">Save your time with Ababil Code Generator</p>
+        </div>
+        
+        <form id="modelGeneratorForm">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Basic Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="modelName" class="form-label">Model Name</label>
+                            <input type="text" class="form-control" id="modelName" required placeholder="e.g., Product, User, Page">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="tableName" class="form-label">Table Name</label>
+                            <input type="text" class="form-control" id="tableName" placeholder="Will be auto-generated if empty">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="modelNamespace" class="form-label">Model Namespace</label>
+                            <input type="text" class="form-control" id="modelNamespace" value="App\Models">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="controllerNamespace" class="form-label">Controller Namespace</label>
+                            <input type="text" class="form-control" id="controllerNamespace" value="App\Http\Controllers">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="baseController" class="form-label">Base Controller</label>
+                            <input type="text" class="form-control" id="baseController" value="Controller">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="authMiddleware" checked>
+                                <label class="form-check-label" for="authMiddleware">Include Auth Middleware</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">                            
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="softDeletes">
+                                <label class="form-check-label" for="softDeletes">Include Soft Deletes</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-list-check"></i> Model Fields</h5>
+                </div>
+                <div class="card-body">
+                    <div id="fieldsContainer">
+                        <!-- Fields will be added here dynamically -->
+                    </div>
+                    
+                    <button type="button" id="addFieldBtn" class="btn btn-primary mt-3">
+                        <i class="bi bi-plus-circle"></i> Add Field
+                    </button>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="bi bi-lightning-charge"></i> Generate Laravel Files
+                </button>
+            </div>
+        </form>
+        
+        <div id="codeOutput" class="mt-5" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3><i class="bi bi-code-square"></i> Generated Code</h3>
+                <div>
+                    <button id="copyAllBtn" class="btn btn-sm btn-outline-primary me-2">
+                        <i class="bi bi-clipboard"></i> Copy All
+                    </button>
+                    <button id="downloadAllBtn" class="btn btn-sm btn-outline-success">
+                        <i class="bi bi-download"></i> Download All
+                    </button>
+                </div>
+            </div>
+            
+            <ul class="nav nav-tabs" id="codeTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="commands-tab" data-bs-toggle="tab" data-bs-target="#commands" type="button" role="tab">
+                        <i class="bi bi-terminal"></i> Commands
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="migration-tab" data-bs-toggle="tab" data-bs-target="#migration" type="button" role="tab">
+                        <i class="bi bi-database"></i> Migration
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="seeder-tab" data-bs-toggle="tab" data-bs-target="#seeder" type="button" role="tab">
+                        <i class="bi bi-database-add"></i> Seeder
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="model-tab" data-bs-toggle="tab" data-bs-target="#model" type="button" role="tab">
+                        <i class="bi bi-box"></i> Model
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="controller-tab" data-bs-toggle="tab" data-bs-target="#controller" type="button" role="tab">
+                        <i class="bi bi-controller"></i> Controller
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="request-tab" data-bs-toggle="tab" data-bs-target="#request" type="button" role="tab" style="display: none;">
+                        <i class="bi bi-check-circle"></i> Request
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="routes-tab" data-bs-toggle="tab" data-bs-target="#routes" type="button" role="tab">
+                        <i class="bi bi-signpost"></i> Routes
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="resource-tab" data-bs-toggle="tab" data-bs-target="#resource" type="button" role="tab">
+                        <i class="bi bi-box-arrow-up"></i> API Resource
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content p-3 border border-top-0 rounded-bottom" id="codeTabsContent">
+                <div class="tab-pane fade show active" id="commands" role="tabpanel">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h5>Terminal Commands</h5>
+                        <div>
+                        <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#commandsCode">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                        </div>
+                    </div>
+                    <pre><code id="commandsCode" class="language-bash"></code></pre>
+                </div>
+
+                <div class="tab-pane fade" id="migration" role="tabpanel">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h5>Migration File</h5>
+                        <div>
+                            <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#migrationCode">
+                                <i class="bi bi-clipboard"></i> Copy
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary download-btn" data-target="#migrationCode" data-filename="migration">
+                                <i class="bi bi-download"></i> Download
+                            </button>
+                        </div>
+                    </div>
+                    <pre><code id="migrationCode" class="language-php"></code></pre>
+                </div>
+
+                <div class="tab-pane fade" id="seeder" role="tabpanel">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h5>Seeder File</h5>
+                        <div>
+                        <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#seederCode">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary download-btn" data-target="#seederCode" data-filename="seeder">
+                            <i class="bi bi-download"></i> Download
+                        </button>
+                        </div>
+                    </div>
+                    <pre><code id="seederCode" class="language-php"></code></pre>
+                </div>
+                
+                <div class="tab-pane fade" id="model" role="tabpanel">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h5>Model File</h5>
+                        <div>
+                            <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#modelCode">
+                                <i class="bi bi-clipboard"></i> Copy
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary download-btn" data-target="#modelCode" data-filename="model">
+                                <i class="bi bi-download"></i> Download
+                            </button>
+                        </div>
+                    </div>
+                    <pre><code id="modelCode" class="language-php"></code></pre>
+                </div>
+                
+                <div class="tab-pane fade" id="controller" role="tabpanel">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h5>Controller File</h5>
+                        <div>
+                            <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#controllerCode">
+                                <i class="bi bi-clipboard"></i> Copy
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary download-btn" data-target="#controllerCode" data-filename="controller">
+                                <i class="bi bi-download"></i> Download
+                            </button>
+                        </div>
+                    </div>
+                    <pre><code id="controllerCode" class="language-php"></code></pre>
+                </div>
+                
+                <div class="tab-pane fade" id="request" role="tabpanel">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h5>Request File</h5>
+                        <div>
+                            <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#requestCode">
+                                <i class="bi bi-clipboard"></i> Copy
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary download-btn" data-target="#requestCode" data-filename="request">
+                                <i class="bi bi-download"></i> Download
+                            </button>
+                        </div>
+                    </div>
+                    <pre><code id="requestCode" class="language-php"></code></pre>
+                </div>
+
+                <div class="tab-pane fade" id="routes" role="tabpanel">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h5>Route Definitions</h5>
+                        <div>
+                        <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#routesCode">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary download-btn" data-target="#routesCode" data-filename="routes">
+                            <i class="bi bi-download"></i> Download
+                        </button>
+                        </div>
+                    </div>
+                    <pre><code id="routesCode" class="language-php"></code></pre>
+                </div>
+
+                <div class="tab-pane fade" id="resource" role="tabpanel">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h5>API Resource File</h5>
+                        <div>
+                        <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="#resourceCode">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary download-btn" data-target="#resourceCode" data-filename="resource">
+                            <i class="bi bi-download"></i> Download
+                        </button>
+                        </div>
+                    </div>
+                    <pre><code id="resourceCode" class="language-php"></code></pre>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Field Template (hidden) -->
+    <div id="fieldTemplate" class="field-container" style="display: none;">
+        <div class="row">
+            <div class="col-md-5">
+                <label class="form-label">Field Name (Database Column)</label>
+                <div class="input-group">
+                    <select class="form-select field-name-select">
+                        <optgroup label="General Identification Fields">
+                            <option value="uuid">uuid</option>
+                            <option value="slug">slug</option>
+                            <option value="code">code</option>
+                            <option value="reference_no">reference_no</option>
+                            <option value="order_no">order_no</option>
+                            <option value="sku">sku</option>
+                            <option value="barcode">barcode</option>
+                        </optgroup>
+
+                        <optgroup label="Basic Text & Content Fields">
+                            <option value="title">title</option>
+                            <option value="subtitle">subtitle</option>
+                            <option value="name">name</option>
+                            <option value="first_name">first_name</option>
+                            <option value="last_name">last_name</option>
+                            <option value="full_name">full_name</option>
+                            <option value="short_name">short_name</option>
+                            <option value="label">label</option>
+                            <option value="tagline">tagline</option>
+                            <option value="description">description</option>
+                            <option value="short_description">short_description</option>
+                            <option value="content">content</option>
+                            <option value="excerpt">excerpt</option>
+                            <option value="notes">notes</option>
+                            <option value="remarks">remarks</option>
+                            <option value="message">message</option>
+                            <option value="comment">comment</option>
+                        </optgroup>
+
+                        <optgroup label="Media Fields">
+                            <option value="image">image</option>
+                            <option value="thumbnail">thumbnail</option>
+                            <option value="banner">banner</option>
+                            <option value="logo">logo</option>
+                            <option value="icon">icon</option>
+                            <option value="file">file</option>
+                            <option value="document">document</option>
+                            <option value="video">video</option>
+                            <option value="audio">audio</option>
+                            <option value="attachment">attachment</option>
+                            <option value="gallery">gallery</option>
+                        </optgroup>
+
+                        <optgroup label="Status & Boolean Fields">
+                            <option value="status">status</option>
+                            <option value="is_active">is_active</option>
+                            <option value="is_featured">is_featured</option>
+                            <option value="is_verified">is_verified</option>
+                            <option value="is_deleted">is_deleted</option>
+                            <option value="is_published">is_published</option>
+                            <option value="is_default">is_default</option>
+                            <option value="is_read">is_read</option>
+                            <option value="is_paid">is_paid</option>
+                        </optgroup>
+
+                        <optgroup label="Numeric & Pricing Fields">
+                            <option value="price">price</option>
+                            <option value="discount">discount</option>
+                            <option value="discount_percentage">discount_percentage</option>
+                            <option value="tax">tax</option>
+                            <option value="quantity">quantity</option>
+                            <option value="stock">stock</option>
+                            <option value="weight">weight</option>
+                            <option value="length">length</option>
+                            <option value="width">width</option>
+                            <option value="height">height</option>
+                            <option value="rating">rating</option>
+                            <option value="score">score</option>
+                        </optgroup>
+
+                        <optgroup label="Date & Time Fields">
+                            <option value="created_at">created_at</option>
+                            <option value="updated_at">updated_at</option>
+                            <option value="deleted_at">deleted_at</option>
+                            <option value="published_at">published_at</option>
+                            <option value="start_date">start_date</option>
+                            <option value="end_date">end_date</option>
+                            <option value="dob">dob</option>
+                            <option value="expires_at">expires_at</option>
+                            <option value="last_login_at">last_login_at</option>
+                            <option value="scheduled_at">scheduled_at</option>
+                        </optgroup>
+
+                        <optgroup label="User & Relation Fields">
+                            <option value="user_id">user_id</option>
+                            <option value="customer_id">customer_id</option>
+                            <option value="admin_id">admin_id</option>
+                            <option value="author_id">author_id</option>
+                            <option value="editor_id">editor_id</option>
+                            <option value="created_by">created_by</option>
+                            <option value="updated_by">updated_by</option>
+                            <option value="category_id">category_id</option>
+                            <option value="parent_id">parent_id</option>
+                            <option value="order_id">order_id</option>
+                            <option value="product_id">product_id</option>
+                            <option value="post_id">post_id</option>
+                            <option value="page_id">page_id</option>
+                        </optgroup>
+
+                        <optgroup label="Contact & Address Fields">
+                            <option value="email">email</option>
+                            <option value="phone">phone</option>
+                            <option value="mobile">mobile</option>
+                            <option value="fax">fax</option>
+                            <option value="address">address</option>
+                            <option value="address_line1">address_line1</option>
+                            <option value="address_line2">address_line2</option>
+                            <option value="city">city</option>
+                            <option value="state">state</option>
+                            <option value="postcode">postcode</option>
+                            <option value="country">country</option>
+                            <option value="latitude">latitude</option>
+                            <option value="longitude">longitude</option>
+                        </optgroup>
+
+                        <optgroup label="System & Technical Fields">
+                            <option value="ip_address">ip_address</option>
+                            <option value="browser">browser</option>
+                            <option value="device">device</option>
+                            <option value="user_agent">user_agent</option>
+                            <option value="settings">settings</option>
+                            <option value="config">config</option>
+                            <option value="meta">meta</option>
+                            <option value="tags">tags</option>
+                            <option value="options">options</option>
+                            <option value="token">token</option>
+                            <option value="api_key">api_key</option>
+                            <option value="secret">secret</option>
+                        </optgroup>
+
+                        <optgroup label="SEO & Marketing Fields">
+                            <option value="meta_title">meta_title</option>
+                            <option value="meta_description">meta_description</option>
+                            <option value="meta_keywords">meta_keywords</option>
+                            <option value="seo_url">seo_url</option>
+                            <option value="canonical_url">canonical_url</option>
+                            <option value="og_image">og_image</option>
+                            <option value="og_title">og_title</option>
+                            <option value="og_description">og_description</option>
+                        </optgroup>
+                        <option value="custom">Custom...</option>
+                    </select>
+                    <input type="text" class="form-control field-name-input" placeholder="Enter custom field name" style="display: none;">
+                </div>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Field Type</label>
+                <select class="form-select field-type">
+                    <option value="string">String</option>
+                    <option value="text">Text</option>
+                    <option value="integer">Integer</option>
+                    <option value="bigInteger">Big Integer</option>
+                    <option value="boolean">Boolean</option>
+                    <option value="date">Date</option>
+                    <option value="datetime">DateTime</option>
+                    <option value="decimal">Decimal</option>
+                    <option value="float">Float</option>
+                    <option value="enum">Enum</option>
+                    <option value="json">JSON</option>
+                    <option value="file">File</option>
+                    <option value="relation">Relation</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Actions</label>
+                <button type="button" class="btn btn-danger remove-field-btn w-100">
+                    <i class="bi bi-trash"></i> Remove
+                </button>
+            </div>
+
+            <div class="relation-options mt-2" style="display: none;">
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label class="form-label">Relationship Type</label>
+                        <select class="form-select relationship-type">
+                            <option value="belongsTo">Belongs To</option>
+                            <option value="hasMany">Has Many</option>
+                            <option value="hasOne">Has One</option>
+                            <option value="belongsToMany">Many To Many</option>
+                            <option value="morphTo">Morph To</option>
+                            <option value="morphMany">Morph Many</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Related Model</label>
+                                    <input type="text" class="form-control related-model" placeholder="e.g., Package">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Foreign Key (auto-generated if empty)</label>
+                                    <input type="text" class="form-control foreign-key" placeholder="e.g., package_id">
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input on-delete-null" type="checkbox" checked>
+                                        <label class="form-check-label">Null on delete</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input on-delete-cascade" type="checkbox">
+                                        <label class="form-check-label">Cascade on delete</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="field-options mt-3">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input nullable-check" type="checkbox">
+                        <label class="form-check-label">Nullable</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input unique-check" type="checkbox">
+                        <label class="form-check-label">Unique</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input index-check" type="checkbox">
+                        <label class="form-check-label">Index</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input default-check" type="checkbox">
+                        <label class="form-check-label">Default</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input fillable-check" type="checkbox" checked>
+                        <label class="form-check-label">Fillable</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input cast-check" type="checkbox">
+                        <label class="form-check-label">Cast</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="options-container mt-3">
+                <div class="default-value-container mt-2" style="display: none;">
+                    <label class="form-label">Default Value</label>
+                    <input type="text" class="form-control default-value" placeholder="Enter default value">
+                </div>
+                
+                <div class="length-option mt-2" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Length</label>
+                            <input type="number" class="form-control field-length" placeholder="e.g., 255">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Precision (for decimal)</label>
+                            <input type="number" class="form-control field-precision" placeholder="e.g., 8">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="enum-options mt-2" style="display: none;">
+                    <label class="form-label">Enum Values (comma separated)</label>
+                    <input type="text" class="form-control enum-values" placeholder="e.g., active,inactive,pending">
+                </div>
+                
+                <div class="file-options mt-2" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Allowed File Types</label>
+                            <input type="text" class="form-control allowed-types" value="jpg,jpeg,png,webp,gif" placeholder="e.g., jpg,png,pdf,doc">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">File Path</label>
+                            <input type="text" class="form-control file-path" value="public/uploads" placeholder="e.g., public/uploads">
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Max File Size (MB)</label>
+                            <input type="number" class="form-control max-file-size" value="2">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="cast-options mt-2" style="display: none;">
+                    <label class="form-label">Cast Type</label>
+                    <select class="form-select cast-type">
+                        <option value="integer">Integer</option>
+                        <option value="float">Float</option>
+                        <option value="boolean">Boolean</option>
+                        <option value="array">Array</option>
+                        <option value="json">JSON</option>
+                        <option value="date">Date</option>
+                        <option value="datetime">DateTime</option>
+                        <option value="collection">Collection</option>
+                        <option value="relation">Relation</option>
+                    </select>
+
+                    <div class="relation-options mt-2" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Related Model</label>
+                                <input type="text" class="form-control related-model" placeholder="e.g., Package">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Foreign Key (auto-generated if empty)</label>
+                                <input type="text" class="form-control foreign-key" placeholder="e.g., package_id">
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input on-delete-null" type="checkbox" checked>
+                                    <label class="form-check-label">Null on delete</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input on-delete-cascade" type="checkbox">
+                                    <label class="form-check-label">Cascade on delete</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="text-center">
+        <p>&copy; 2025 Laravel Generator. All rights reserved. Powered by 
+            <a href="https://about.me/iftekherahmed/getstarted">Iftekher Ahmed</a>.
+        </p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="assets/js/main.js"></script>
+
+    <script src="assets/js/seeder-generator.js"></script>
+    <script src="assets/js/resource-generator.js"></script>
+    <script src="assets/js/routes-generator.js"></script>
+    <script src="assets/js/commands-generator.js"></script>
+    <script src="assets/js/model-generator.js"></script>
+    <script src="assets/js/migration-generator.js"></script>
+    <script src="assets/js/controller-generator.js"></script>
+    <script>hljs.highlightAll();</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</body>
+</html>
